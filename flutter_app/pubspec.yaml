@@ -1,0 +1,90 @@
+name: edubrain
+description: EduBrain AI - Smart School Management Platform
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP & API
+  dio: ^5.4.0
+  http: ^1.1.0
+
+  # State Management
+  provider: ^6.1.1
+  flutter_riverpod: ^2.4.0
+
+  # Storage & Auth
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.0.0
+  jwt_decoder: ^2.0.1
+
+  # Face Recognition
+  google_mlkit_face_detection: ^0.9.0
+  camera: ^0.10.5+5
+  image_picker: ^1.0.4
+
+  # Fingerprint Auth
+  local_auth: ^2.1.8
+
+  # UI Components
+  cupertino_icons: ^1.0.6
+  flutter_svg: ^2.0.9
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  lottie: ^2.7.0
+
+  # Charts & Graphs
+  fl_chart: ^0.66.2
+  syncfusion_flutter_charts: ^24.1.41
+
+  # File & PDF
+  pdf: ^3.10.8
+  printing: ^5.12.0
+  file_picker: ^6.1.1
+  open_file: ^3.3.2
+
+  # Notifications
+  firebase_core: ^2.24.0
+  firebase_messaging: ^14.7.10
+  flutter_local_notifications: ^16.3.0
+
+  # QR Code
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^3.5.6
+
+  # Utils
+  intl: ^0.18.1
+  connectivity_plus: ^5.0.2
+  image: ^4.1.3
+  path_provider: ^2.1.1
+  url_launcher: ^6.2.2
+  permission_handler: ^11.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.7
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700

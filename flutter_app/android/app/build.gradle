@@ -1,0 +1,116 @@
+// ─── EduBrain AI — Android App build.gradle ───────────────────────────────────
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) flutterVersionCode = '1'
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) flutterVersionName = '1.0.0'
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    namespace "in.edubrain.app"
+    compileSdkVersion 34
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "in.edubrain.app"
+        minSdkVersion 23          // Required for biometrics
+        targetSdkVersion 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
+
+        // For ML Kit face detection
+        aaptOptions {
+            noCompress "tflite"
+        }
+    }
+
+    signingConfigs {
+        release {
+            // Set these in local.properties or CI environment
+            keyAlias System.getenv('KEY_ALIAS') ?: 'edubrain'
+            keyPassword System.getenv('KEY_PASSWORD') ?: ''
+            storeFile file(System.getenv('KEYSTORE_PATH') ?: 'keystore/edubrain.jks')
+            storePassword System.getenv('STORE_PASSWORD') ?: ''
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // Split APKs by ABI for smaller file size
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+            universalApk true   // also generate universal APK
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    // ML Kit - Face Detection
+    implementation 'com.google.mlkit:face-detection:16.1.5'
+
+    // Biometrics
+    implementation 'androidx.biometric:biometric:1.1.0'
+
+    // MultiDex
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    // Camera
+    implementation 'androidx.camera:camera-core:1.3.1'
+    implementation 'androidx.camera:camera-camera2:1.3.1'
+}

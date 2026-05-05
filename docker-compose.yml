@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # ── Backend API ──────────────────────────────────────────────────────────────
+  api:
+    build: ./backend
+    container_name: edubrain-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGO_URI: ${MONGO_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      TWILIO_SID: ${TWILIO_SID}
+      TWILIO_TOKEN: ${TWILIO_TOKEN}
+      TWILIO_FROM: ${TWILIO_FROM}
+      WA_TOKEN: ${WA_TOKEN}
+      WA_PHONE_ID: ${WA_PHONE_ID}
+      FCM_SERVER_KEY: ${FCM_SERVER_KEY}
+      RAZORPAY_KEY: ${RAZORPAY_KEY}
+      RAZORPAY_SECRET: ${RAZORPAY_SECRET}
+    depends_on:
+      - mongodb
+    networks:
+      - edubrain-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── MongoDB ──────────────────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: edubrain-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-edubrain}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-edubrain_pass_2026}
+      MONGO_INITDB_DATABASE: edubrain
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/init.js
+    networks:
+      - edubrain-network
+
+  # ── Nginx (Web server for static files) ─────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: edubrain-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./edubrain_web:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - edubrain-network
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  edubrain-network:
+    driver: bridge
